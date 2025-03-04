@@ -104,4 +104,11 @@ export function getMetricsByDate(data: AdMetric[], campaignId: string): AdMetric
 
 export function getMetricOptions(activeTab: SheetTab = 'daily') {
   return TAB_CONFIGS[activeTab]?.metrics || {}
+}
+
+// SWR configuration without cache control
+export const swrConfig = {
+  revalidateOnFocus: true,
+  revalidateOnReconnect: true,
+  dedupingInterval: 5000
 } 

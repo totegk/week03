@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { useSettings } from '@/lib/contexts/SettingsContext'
 import { fetchAllTabsData } from '@/lib/sheetsData'
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/utils'
-import type { SearchTermMetric } from '@/lib/types'
+import type { SearchTermMetric, TabData } from '@/lib/types'
 import {
     Table,
     TableBody,
@@ -24,7 +24,7 @@ export default function TermsPage() {
     const [sortField, setSortField] = useState<SortField>('cost')
     const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
-    const { data: tabsData, error, isLoading } = useSWR(
+    const { data: tabsData, error, isLoading } = useSWR<TabData>(
         settings.sheetUrl,
         fetchAllTabsData
     )
@@ -41,7 +41,7 @@ export default function TermsPage() {
         return <div className="p-8 text-center">Loading...</div>
     }
 
-    const searchTerms = tabsData?.searchTerms || []
+    const searchTerms = (tabsData?.searchTerms || []) as SearchTermMetric[]
 
     // Sort data
     const sortedTerms = [...searchTerms].sort((a, b) => {
@@ -78,7 +78,7 @@ export default function TermsPage() {
     return (
         <div className="container mx-auto px-4 py-12 mt-16">
             <h1 className="text-3xl font-bold mb-12 text-gray-900">Search Terms</h1>
-        
+
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
