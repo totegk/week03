@@ -18,12 +18,9 @@ async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[]
       return []
     }
 
-    // Debug the raw data
-    console.log(`Raw data for ${tab} tab:`, rawData)
-
     // Parse data based on tab type
     if (tab === 'searchTerms') {
-      const mappedData = rawData.map((row: any) => ({
+      return rawData.map((row: any) => ({
         search_term: String(row['search_term'] || ''),
         campaign: String(row['campaign'] || ''),
         ad_group: String(row['ad_group'] || ''),
@@ -39,8 +36,6 @@ async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[]
         roas: Number(row['roas'] || 0),
         aov: Number(row['aov'] || 0)
       }))
-      console.log('Mapped search terms data:', mappedData)
-      return mappedData
     }
 
     // Daily metrics
@@ -109,4 +104,11 @@ export function getMetricsByDate(data: AdMetric[], campaignId: string): AdMetric
 
 export function getMetricOptions(activeTab: SheetTab = 'daily') {
   return TAB_CONFIGS[activeTab]?.metrics || {}
+}
+
+// SWR configuration without cache control
+export const swrConfig = {
+  revalidateOnFocus: true,
+  revalidateOnReconnect: true,
+  dedupingInterval: 5000
 } 
