@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1naJIp5mSvAbzrboj6ANj1nZhDuMribPjhb-3oIE2pwQ/edit?usp=sharing'; // leave blank or add a sheet here
+const SHEET_URL = '';                     // add your sheet url here
 const SEARCH_TERMS_TAB = 'SearchTerms';
 const DAILY_TAB = 'Daily';
 
