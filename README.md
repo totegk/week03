@@ -7,9 +7,8 @@ Use cursor composer to create whatever you can think of!
 
 ## Technologies used
 This doesn't really matter, but is useful for the AI to understand more about this project. We are using the following technologies
-- React with Next.js 14 App Router
-- TailwindCSS
-- A google sheet deployed as a web app for the data store
-- A google script to power the data store (using the 8020agent script for now)
+- React with Next.js 15 App Router
+- TailwindCSS for design
+- A google sheet deployed as a web app for the data storage
+- A google script to power data fetching 
 
-.
