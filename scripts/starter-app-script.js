@@ -37,7 +37,6 @@ SELECT
   segments.date
 FROM campaign
 WHERE segments.date DURING LAST_30_DAYS
-  AND campaign.advertising_channel_type = "SEARCH"
 ORDER BY segments.date DESC, metrics.cost_micros DESC
 `;
 
@@ -66,7 +65,7 @@ function main() {
     processTab(
       ss,
       DAILY_TAB,
-      ["campaign", "campaignId", "clicks", "lostBudget", "imprShare", "lostRank", "value", "conv", "cost", "impr", "date"],
+      ["campaign", "campaignId", "impr", "clicks", "lostBudget", "imprShare", "lostRank", "value", "conv", "cost", "date"],
       DAILY_QUERY,
       processDailyData
     );
@@ -160,7 +159,7 @@ function processDailyData(rows) {
     const date = String(row['segments.date'] || '');
 
     // Create a new row with the data
-    const newRow = [campaign, campaignId, clicks, lostBudget, imprShare, lostRank, value, conv, cost, impr, date];
+    const newRow = [campaign, campaignId, impr, clicks, lostBudget, imprShare, lostRank, value, conv, cost, date];
 
     // Push new row to the data array
     data.push(newRow);
