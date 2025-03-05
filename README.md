@@ -11,3 +11,5 @@ This doesn't really matter, but is useful for the AI to understand more about th
 - TailwindCSS
 - A google sheet deployed as a web app for the data store
 - A google script to power the data store (using the 8020agent script for now)
+
+.
