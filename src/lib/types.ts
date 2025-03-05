@@ -22,9 +22,6 @@ export interface AdMetric {
   campaign: string
   campaignId: string
   clicks: number
-  lostBudget: number
-  imprShare: number
-  lostRank: number
   value: number
   conv: number
   cost: number
@@ -56,7 +53,6 @@ export interface DailyMetrics extends AdMetric {
   CvR: number
   CPA: number
   ROAS: number
-  AOV: number
   CPC: number
 }
 
@@ -93,7 +89,7 @@ export function isSearchTermMetric(data: any): data is SearchTermMetric {
 
 // Type guard for daily metrics
 export function isAdMetric(data: any): data is AdMetric {
-  return 'campaignId' in data && 'lostBudget' in data
+  return 'campaignId' in data && 'impr' in data
 }
 
 // Combined tab data type

@@ -12,9 +12,6 @@ export function calculateMetrics(data: AdMetric[]): DailyMetrics {
     cost: acc.cost + d.cost,
     conv: acc.conv + d.conv,
     value: acc.value + d.value,
-    lostBudget: acc.lostBudget + d.lostBudget,
-    imprShare: acc.imprShare + d.imprShare,
-    lostRank: acc.lostRank + d.lostRank
   }), {
     campaign: '',
     campaignId: '',
@@ -23,10 +20,7 @@ export function calculateMetrics(data: AdMetric[]): DailyMetrics {
     impr: 0,
     cost: 0,
     conv: 0,
-    value: 0,
-    lostBudget: 0,
-    imprShare: 0,
-    lostRank: 0
+    value: 0
   } as AdMetric)
 
   return {
@@ -35,7 +29,6 @@ export function calculateMetrics(data: AdMetric[]): DailyMetrics {
     CvR: totals.clicks ? (totals.conv / totals.clicks) * 100 : 0,
     CPA: totals.conv ? totals.cost / totals.conv : 0,
     ROAS: totals.cost ? totals.value / totals.cost : 0,
-    AOV: totals.conv ? totals.value / totals.conv : 0,
     CPC: totals.clicks ? totals.cost / totals.clicks : 0
   }
 }
@@ -48,7 +41,6 @@ export function calculateDailyMetrics(data: AdMetric[]): DailyMetrics[] {
     CvR: d.clicks ? (d.conv / d.clicks) * 100 : 0,
     CPA: d.conv ? d.cost / d.conv : 0,
     ROAS: d.cost ? d.value / d.cost : 0,
-    AOV: d.conv ? d.value / d.conv : 0,
     CPC: d.clicks ? d.cost / d.clicks : 0
   }))
 }

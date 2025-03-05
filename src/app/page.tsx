@@ -9,13 +9,13 @@ import type { AdMetric, DailyMetrics, TabData } from '@/lib/types'
 import { calculateDailyMetrics } from '@/lib/metrics'
 import { MetricCard } from '@/components/MetricCard'
 import { MetricsChart } from '@/components/MetricsChart'
+import { CampaignSelect } from '@/components/CampaignSelect'
 import Link from 'next/link'
 import { Settings } from 'lucide-react'
 import { formatCurrency, formatPercent, formatConversions } from '@/lib/utils'
 
 type DisplayMetric = 'impr' | 'clicks' | 'CTR' | 'CPC' | 'cost' |
-    'conv' | 'CvR' | 'CPA' | 'value' | 'ROAS' |
-    'AOV' | 'imprShare' | 'lostBudget' | 'lostRank'
+    'conv' | 'CvR' | 'CPA' | 'value' | 'ROAS'
 
 const metricConfig = {
     impr: { label: 'Impressions', format: (v: number) => v.toLocaleString(), row: 1 },
@@ -27,19 +27,45 @@ const metricConfig = {
     CvR: { label: 'Conv Rate', format: formatPercent, row: 2 },
     CPA: { label: 'CPA', format: (v: number, currency: string) => formatCurrency(v, currency), row: 2 },
     value: { label: 'Value', format: (v: number, currency: string) => formatCurrency(v, currency), row: 2 },
-    ROAS: { label: 'ROAS', format: (v: number) => v.toFixed(2) + 'x', row: 2 },
-    AOV: { label: 'AOV', format: (v: number, currency: string) => formatCurrency(v, currency), row: 3 },
-    imprShare: { label: 'Impr Share', format: formatPercent, row: 3 },
-    lostBudget: { label: 'Lost IS% Budget', format: formatPercent, row: 3 },
-    lostRank: { label: 'Lost IS% Rank', format: formatPercent, row: 3 }
+    ROAS: { label: 'ROAS', format: (v: number) => v.toFixed(2) + 'x', row: 2 }
 } as const
 
 export default function DashboardPage() {
-    const { settings, setCampaigns, setSelectedCampaign } = useSettings()
+    const { settings, setCampaigns } = useSettings()
     const [data, setData] = useState<AdMetric[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string>()
     const [selectedMetrics, setSelectedMetrics] = useState<[DisplayMetric, DisplayMetric]>(['cost', 'value'])
+    const [selectedCampaignId, setSelectedCampaignId] = useState<string>('')
+
+    // Aggregate metrics by date when viewing all campaigns
+    const aggregateMetricsByDate = (data: AdMetric[]): AdMetric[] => {
+        const metricsByDate = data.reduce((acc, metric) => {
+            const date = metric.date
+            if (!acc[date]) {
+                acc[date] = {
+                    campaign: 'All Campaigns',
+                    campaignId: '',
+                    date,
+                    impr: 0,
+                    clicks: 0,
+                    cost: 0,
+                    conv: 0,
+                    value: 0,
+                }
+            }
+            acc[date].impr += metric.impr
+            acc[date].clicks += metric.clicks
+            acc[date].cost += metric.cost
+            acc[date].conv += metric.conv
+            acc[date].value += metric.value
+            return acc
+        }, {} as Record<string, AdMetric>)
+
+        return Object.values(metricsByDate).sort((a, b) =>
+            new Date(a.date).getTime() - new Date(b.date).getTime()
+        )
+    }
 
     useEffect(() => {
         if (!settings.sheetUrl) {
@@ -54,22 +80,18 @@ export default function DashboardPage() {
 
                 const campaigns = getCampaigns(dailyData)
                 setCampaigns(campaigns)
-
-                if (!settings.selectedCampaign && campaigns.length > 0) {
-                    setSelectedCampaign(campaigns[0].id)
-                }
             })
             .catch((err: Error) => {
                 console.error('Error loading data:', err)
                 setError('Failed to load data. Please check your Sheet URL.')
             })
             .finally(() => setIsLoading(false))
-    }, [settings.sheetUrl, setCampaigns, settings.selectedCampaign, setSelectedCampaign])
+    }, [settings.sheetUrl, setCampaigns])
 
     const dailyMetrics = calculateDailyMetrics(
-        settings.selectedCampaign
-            ? data.filter(d => d.campaignId === settings.selectedCampaign)
-            : data
+        selectedCampaignId
+            ? data.filter(d => d.campaignId === selectedCampaignId)
+            : aggregateMetricsByDate(data)
     )
 
     const calculateTotals = () => {
@@ -81,12 +103,8 @@ export default function DashboardPage() {
             cost: acc.cost + d.cost,
             conv: acc.conv + d.conv,
             value: acc.value + d.value,
-            imprShare: acc.imprShare + d.imprShare,
-            lostBudget: acc.lostBudget + d.lostBudget,
-            lostRank: acc.lostRank + d.lostRank
         }), {
             impr: 0, clicks: 0, cost: 0, conv: 0, value: 0,
-            imprShare: 0, lostBudget: 0, lostRank: 0
         })
 
         return {
@@ -96,10 +114,6 @@ export default function DashboardPage() {
             CvR: (sums.clicks ? (sums.conv / sums.clicks) * 100 : 0),
             CPA: (sums.conv ? sums.cost / sums.conv : 0),
             ROAS: (sums.cost ? sums.value / sums.cost : 0),
-            AOV: (sums.conv ? sums.value / sums.conv : 0),
-            imprShare: sums.imprShare / dailyMetrics.length * 100,
-            lostBudget: sums.lostBudget / dailyMetrics.length * 100,
-            lostRank: sums.lostRank / dailyMetrics.length * 100
         }
     }
 
@@ -117,7 +131,13 @@ export default function DashboardPage() {
     return (
         <DashboardLayout error={error}>
             <div className="space-y-6">
-                {[1, 2, 3].map(row => (
+                <CampaignSelect
+                    campaigns={settings.campaigns || []}
+                    selectedId={selectedCampaignId}
+                    onSelect={setSelectedCampaignId}
+                />
+
+                {[1, 2].map(row => (
                     <div key={row} className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                         {Object.entries(metricConfig)
                             .filter(([_, config]) => config.row === row)

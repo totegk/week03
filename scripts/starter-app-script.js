@@ -27,9 +27,6 @@ SELECT
   campaign.name,
   campaign.id,
   metrics.clicks,
-  metrics.search_budget_lost_impression_share,
-  metrics.search_impression_share,
-  metrics.search_rank_lost_impression_share,
   metrics.conversions_value,
   metrics.conversions,
   metrics.cost_micros,
@@ -56,7 +53,7 @@ function main() {
     processTab(
       ss,
       SEARCH_TERMS_TAB,
-      ["search_term", "campaign", "ad_group", "impressions", "clicks", "cost", "conversions", "conversion_value", "cpc", "ctr", "conv_rate", "cpa", "roas", "aov"],
+      ["search_term", "campaign", "ad_group", "impressions", "clicks", "cost", "conversions", "conversion_value", "cpc", "ctr", "conv_rate", "cpa", "roas"],
       SEARCH_TERMS_QUERY,
       calculateSearchTermsMetrics
     );
@@ -65,7 +62,7 @@ function main() {
     processTab(
       ss,
       DAILY_TAB,
-      ["campaign", "campaignId", "impr", "clicks", "lostBudget", "imprShare", "lostRank", "value", "conv", "cost", "date"],
+      ["campaign", "campaignId", "impr", "clicks", "value", "conv", "cost", "date"],
       DAILY_QUERY,
       processDailyData
     );
@@ -128,10 +125,9 @@ function calculateSearchTermsMetrics(rows) {
     const convRate = clicks > 0 ? conversions / clicks : 0;
     const cpa = conversions > 0 ? cost / conversions : 0;
     const roas = cost > 0 ? conversionValue / cost : 0;
-    const aov = conversions > 0 ? conversionValue / conversions : 0;
 
     // Add all variables and calculated metrics to a new row
-    const newRow = [searchTerm, campaign, adGroup, impressions, clicks, cost, conversions, conversionValue, cpc, ctr, convRate, cpa, roas, aov];
+    const newRow = [searchTerm, campaign, adGroup, impressions, clicks, cost, conversions, conversionValue, cpc, ctr, convRate, cpa, roas];
 
     // Push new row to the data array
     data.push(newRow);
@@ -148,9 +144,6 @@ function processDailyData(rows) {
     const campaign = String(row['campaign.name'] || '');
     const campaignId = String(row['campaign.id'] || '');
     const clicks = Number(row['metrics.clicks'] || 0);
-    const lostBudget = Number(row['metrics.search_budget_lost_impression_share'] || 0);
-    const imprShare = Number(row['metrics.search_impression_share'] || 0);
-    const lostRank = Number(row['metrics.search_rank_lost_impression_share'] || 0);
     const value = Number(row['metrics.conversions_value'] || 0);
     const conv = Number(row['metrics.conversions'] || 0);
     const costMicros = Number(row['metrics.cost_micros'] || 0);
@@ -159,7 +152,7 @@ function processDailyData(rows) {
     const date = String(row['segments.date'] || '');
 
     // Create a new row with the data
-    const newRow = [campaign, campaignId, impr, clicks, lostBudget, imprShare, lostRank, value, conv, cost, date];
+    const newRow = [campaign, campaignId, impr, clicks, value, conv, cost, date];
 
     // Push new row to the data array
     data.push(newRow);
