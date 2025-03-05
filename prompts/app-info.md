@@ -41,8 +41,8 @@ src/
 
 ### Calculated Metrics
 - CTR: Click-Through Rate (clicks/impr)
+- CPC: Cost per Click (cost/clicks)
 - CvR: Conversion Rate (conv/clicks)
-- AOV: Average Order Value (value/conv)
 - ROAS: Return on Ad Spend (value/cost)
 - CPA: Cost per Acquisition (cost/conv)
 

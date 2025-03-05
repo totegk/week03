@@ -19,7 +19,6 @@
 - Use `CPC` for Cost per Click
 - Use `CTR` for Click-Through Rate
 - Use `CvR` for Conversion Rate
-- Use `AOV` for Average Order Value
 - Use `ROAS` for Return on Ad Spend
 - Use `CPA` for Cost per Acquisition
 

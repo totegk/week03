@@ -10,9 +10,8 @@ import { calculateDailyMetrics } from '@/lib/metrics'
 import { MetricCard } from '@/components/MetricCard'
 import { MetricsChart } from '@/components/MetricsChart'
 import { CampaignSelect } from '@/components/CampaignSelect'
-import Link from 'next/link'
-import { Settings } from 'lucide-react'
 import { formatCurrency, formatPercent, formatConversions } from '@/lib/utils'
+import { COLORS } from '@/lib/config'
 
 type DisplayMetric = 'impr' | 'clicks' | 'CTR' | 'CPC' | 'cost' |
     'conv' | 'CvR' | 'CPA' | 'value' | 'ROAS'
@@ -158,13 +157,13 @@ export default function DashboardPage() {
                     metric1={{
                         key: selectedMetrics[0],
                         label: metricConfig[selectedMetrics[0]].label,
-                        color: '#1e40af',
+                        color: COLORS.primary,
                         format: (v: number) => metricConfig[selectedMetrics[0]].format(v, settings.currency)
                     }}
                     metric2={{
                         key: selectedMetrics[1],
                         label: metricConfig[selectedMetrics[1]].label,
-                        color: '#ea580c',
+                        color: COLORS.secondary,
                         format: (v: number) => metricConfig[selectedMetrics[1]].format(v, settings.currency)
                     }}
                 />

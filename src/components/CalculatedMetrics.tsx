@@ -65,12 +65,6 @@ export function CalculatedMetricsDisplay({
         isSelected={selectedMetrics.includes('ROAS')}
         onClick={() => onMetricClick('ROAS')}
       />
-      <MetricCard
-        label="AOV"
-        value={formatCurrency(metrics.AOV, settings.currency)}
-        isSelected={selectedMetrics.includes('AOV')}
-        onClick={() => onMetricClick('AOV')}
-      />
     </div>
   )
 } 
