@@ -13,3 +13,9 @@ This doesn't really matter, but is useful for the AI to understand more about th
 - A google script to power data fetching 
 
 # week03
+
+## Mi Proyecto Personal
+
+Este es mi fork personal del proyecto "Build the Agent". Estoy usando este repositorio para aprender y experimentar con Git y desarrollo web.
+
+Fecha de inicio: Marzo 2024
