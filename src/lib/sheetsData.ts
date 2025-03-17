@@ -1,8 +1,8 @@
 // src/lib/sheetsData.ts
-import { AdMetric, Campaign, SearchTermMetric, TabData, isSearchTermMetric } from './types'
+import { AdMetric, Campaign, DomoCanalesMetric, SearchTermMetric, TabData, isSearchTermMetric, isDomoCanalesMetric } from './types'
 import { SHEET_TABS, SheetTab, TAB_CONFIGS, DEFAULT_SHEET_URL } from './config'
 
-async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[] | SearchTermMetric[]> {
+async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[] | SearchTermMetric[] | DomoCanalesMetric[]> {
   try {
     const urlWithTab = `${sheetUrl}?tab=${tab}`
     const response = await fetch(urlWithTab)
@@ -15,6 +15,39 @@ async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[]
 
     if (!Array.isArray(rawData)) {
       console.error(`Response is not an array:`, rawData)
+      
+      // Si estamos buscando DomoCanales y hay un error, intentar con nombres alternativos
+      if (tab === 'DomoCanales' && rawData && typeof rawData === 'object' && 'error' in rawData) {
+        const errorMsg = String(rawData.error || '');
+        if (errorMsg.includes('Sheet not found')) {
+          console.log('Intentando con nombre alternativo: DomoCanles');
+          
+          // Intentar con un nombre alternativo
+          try {
+            const altResponse = await fetch(`${sheetUrl}?tab=DomoCanles`);
+            
+            if (altResponse.ok) {
+              const altData = await altResponse.json();
+              
+              if (Array.isArray(altData) && altData.length > 0) {
+                console.log(`Encontramos datos con el nombre alternativo: DomoCanles (${altData.length} filas)`);
+                
+                return altData.map((row: any) => ({
+                  date: String(row.date || ''),
+                  platform: String(row.platform || ''),
+                  channel: String(row.channel || ''),
+                  sessions: Number(row.sessions || 0),
+                  transactions: Number(row.transactions || 0),
+                  transactionRevenue: Number(row.transactionRevenue || 0)
+                }));
+              }
+            }
+          } catch (altError) {
+            console.error('Error al intentar nombre alternativo:', altError);
+          }
+        }
+      }
+      
       return []
     }
 
@@ -35,6 +68,18 @@ async function fetchTabData(sheetUrl: string, tab: SheetTab): Promise<AdMetric[]
         cpa: Number(row['cpa'] || 0),
         roas: Number(row['roas'] || 0),
         aov: Number(row['aov'] || 0)
+      }))
+    }
+    
+    // DomoCanales data
+    if (tab === 'DomoCanales') {
+      return rawData.map((row: any) => ({
+        date: String(row['date'] || ''),
+        platform: String(row['platform'] || ''),
+        channel: String(row['channel'] || ''),
+        sessions: Number(row['sessions'] || 0),
+        transactions: Number(row['transactions'] || 0),
+        transactionRevenue: Number(row['transactionRevenue'] || 0)
       }))
     }
 
@@ -66,11 +111,13 @@ export async function fetchAllTabsData(sheetUrl: string = DEFAULT_SHEET_URL): Pr
   return results.reduce((acc, { tab, data }) => {
     if (tab === 'searchTerms') {
       acc[tab] = data as SearchTermMetric[]
+    } else if (tab === 'DomoCanales') {
+      acc[tab] = data as DomoCanalesMetric[]
     } else {
       acc[tab] = data as AdMetric[]
     }
     return acc
-  }, { daily: [], searchTerms: [] } as TabData)
+  }, { daily: [], searchTerms: [], DomoCanales: [] } as TabData)
 }
 
 export function getCampaigns(data: AdMetric[]): Campaign[] {

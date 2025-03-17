@@ -47,6 +47,16 @@ export interface SearchTermMetric {
   aov: number
 }
 
+// DomoCanales metrics - Actualizado según la estructura real de la hoja
+export interface DomoCanalesMetric {
+  date: string
+  platform: string
+  channel: string
+  sessions: number
+  transactions: number
+  transactionRevenue: number
+}
+
 // Calculated metrics for daily data
 export interface DailyMetrics extends AdMetric {
   CTR: number
@@ -62,8 +72,11 @@ export type MetricKey = keyof Omit<AdMetric, 'campaign' | 'campaignId' | 'date'>
 // Search term metrics excluding metadata
 export type SearchTermMetricKey = keyof Omit<SearchTermMetric, 'search_term' | 'campaign' | 'ad_group'>
 
+// DomoCanales metrics excluding metadata
+export type DomoCanalesMetricKey = keyof Omit<DomoCanalesMetric, 'date' | 'platform' | 'channel'>
+
 // All possible metrics (regular + calculated)
-export type AllMetricKeys = MetricKey | keyof Omit<DailyMetrics, keyof AdMetric> | SearchTermMetricKey
+export type AllMetricKeys = MetricKey | keyof Omit<DailyMetrics, keyof AdMetric> | SearchTermMetricKey | DomoCanalesMetricKey
 
 export interface MetricOption {
   label: string
@@ -92,10 +105,16 @@ export function isAdMetric(data: any): data is AdMetric {
   return 'campaignId' in data && 'impr' in data
 }
 
+// Type guard for DomoCanales metrics
+export function isDomoCanalesMetric(data: any): data is DomoCanalesMetric {
+  return 'platform' in data && 'channel' in data
+}
+
 // Combined tab data type
 export type TabData = {
   daily: AdMetric[]
   searchTerms: SearchTermMetric[]
+  DomoCanales: DomoCanalesMetric[]
 }
 
 // Helper type to get numeric values from metrics
