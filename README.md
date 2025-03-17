@@ -12,3 +12,4 @@ This doesn't really matter, but is useful for the AI to understand more about th
 - A google sheet deployed as a web app for the data storage
 - A google script to power data fetching 
 
+# week03
